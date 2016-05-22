@@ -8,9 +8,12 @@
 class Vmodule{
 
 public:
-  Vmodule();
+  Vmodule(){};
 
-  ~Vmodule();
+  virtual ~Vmodule();
+
+
+
 
 };
 

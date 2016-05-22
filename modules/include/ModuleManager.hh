@@ -1,6 +1,8 @@
 #ifndef ModuleManager_hh
 #define ModuleManager_hh 1
 
+#include <map>
+
 class ModuleManager{
 
 public:
@@ -11,9 +13,10 @@ protected:
 
   ModuleManager();
 
+  ~ModuleManager(){};
 
-
-
+private:
+  map<string, Vmodule*> moduleCollection;
 
 
 public:
