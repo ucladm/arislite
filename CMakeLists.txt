@@ -27,11 +27,6 @@ endif()
 set(CMAKE_BUILD_TYPE Debug)
 
 
-###############        fftw include/lib dir        #####################
-include(config/cmake/FindFFTW.cmake)
-include_directories(${FFTW_INCLUDES} )
-link_directories(${FFTW_LIBRARIES_DIRS})
-
 ###############        Root include/lib dir        #####################
 include(config/cmake/FindROOT.cmake)
 include_directories( ${ROOT_INCLUDE_DIR}  )
@@ -40,22 +35,6 @@ link_directories( ${ROOT_LIBRARY_DIR})
 ###############        boost include/lib dir       #####################
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
-
-###############          pq include/lib dir        #####################
-find_package(PostgreSQL REQUIRED)
-include_directories (${PostgreSQL_INCLUDE_DIRS})
-
-###############          mysql include/lib dir        #####################
-include(config/cmake/FindMysql.cmake)
-include_directories (${MYSQL_INCLUDE_DIR})
-
-###############     tinyxml include/lib dir        #####################
-include(config/cmake/FindTinyXML.cmake)
-include_directories(${TinyXML_INCLUDE_DIRS})
-
-###############        pqxx include/lib dir        #####################
-include(config/cmake/FindPQXX.cmake)
-include_directories(${Pqxx_INCLUDE_DIRS})
 
 
 ###############             Root flags            #####################
@@ -95,11 +74,12 @@ endif (CMAKE_SYSTEM_NAME MATCHES Darwin)
 
 include_directories (${PostgreSQL_INCLUDE_DIR})
 
+include_directories (${PROJECT_SOURCE_DIR}/reader/include)
+include_directories (${PROJECT_SOURCE_DIR}/modules/include)
 
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/reader/src/*.cc ${PROJECT_SOURCE_DIR}/modules/src/*.cc)
 
-file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
-
+file(GLOB headers ${PROJECT_SOURCE_DIR}/reader/include/*.hh ${PROJECT_SOURCE_DIR}/modules/include/*.hh)
 
 ###############      library extension  #####################
 IF(${UNIX})
@@ -130,22 +110,18 @@ add_library(ArisLite SHARED ${sources} ${headers})
 target_link_libraries(ArisLite ${ROOT_LIBRARIES})
 target_link_libraries(ArisLite ${FFTW_LIBRARIES})
 target_link_libraries(ArisLite ${Boost_LIBRARIES})
-target_link_libraries(ArisLite ${PostgreSQL_LIBRARIES})
-target_link_libraries(ArisLite ${TinyXML_LIBRARIES})
-target_link_libraries(ArisLite ${Pqxx_LIBRARIES})
-target_link_libraries(ArisLite ${MYSQL_LIBRARIES})
 
 
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/lib)
 
 
-file( GLOB  APP_SOURCES ${PROJECT_SOURCE_DIR}/exe/*.cpp )
+file( GLOB  APP_SOURCES ${PROJECT_SOURCE_DIR}/exe/*.cc)
 
 
 foreach( testsourcefile ${APP_SOURCES} )
 	 # I used a simple string replace, to cut off .cpp.
-	 string( REPLACE ".cpp" ".bin" testname_ ${testsourcefile} )
-	 string( REPLACE "${PROJECT_SOURCE_DIR}/analysis/examples/" "" testname ${testname_} )
+	 string( REPLACE ".cc" ".bin" testname_ ${testsourcefile} )
+	 string( REPLACE "${PROJECT_SOURCE_DIR}/exe/" "" testname ${testname_} )
 	 add_executable(${testname} ${testsourcefile})
 
 	 # Make sure YourLib is linked to each app
@@ -153,10 +129,6 @@ foreach( testsourcefile ${APP_SOURCES} )
 	 target_link_libraries(${testname} ${ROOT_LIBRARIES})
 	 target_link_libraries(${testname} ${FFTW_LIBRARIES})
 	 target_link_libraries(${testname} ${Boost_LIBRARIES})
-	 target_link_libraries(${testname} ${PostgreSQL_LIBRARIES})
-	 target_link_libraries(${testname} ${TinyXML_LIBRARIES})
-	 target_link_libraries(${testname} ${Pqxx_LIBRARIES})
-	 target_link_libraries(${testname} ${MYSQL_LIBRARIES})
 
 endforeach( testsourcefile ${APP_SOURCES} )
 
