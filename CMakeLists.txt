@@ -76,10 +76,12 @@ include_directories (${PostgreSQL_INCLUDE_DIR})
 
 include_directories (${PROJECT_SOURCE_DIR}/reader/include)
 include_directories (${PROJECT_SOURCE_DIR}/modules/include)
+include_directories (${PROJECT_SOURCE_DIR}/products)
+include_directories (${PROJECT_SOURCE_DIR})
 
-file(GLOB sources ${PROJECT_SOURCE_DIR}/reader/src/*.cc ${PROJECT_SOURCE_DIR}/modules/src/*.cc)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/reader/src/*.cc ${PROJECT_SOURCE_DIR}/modules/src/*.cc ${PROJECT_SOURCE_DIR}/products/*.cc)
 
-file(GLOB headers ${PROJECT_SOURCE_DIR}/reader/include/*.hh ${PROJECT_SOURCE_DIR}/modules/include/*.hh)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/reader/include/*.hh ${PROJECT_SOURCE_DIR}/modules/include/*.hh ${PROJECT_SOURCE_DIR}/products/*.hh)
 
 ###############      library extension  #####################
 IF(${UNIX})
@@ -102,6 +104,14 @@ ENDIF(${APPLE})
 ###############          Output directory          #####################
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+
+
+include_directories (${PROJECT_SOURCE_DIR}/arisana/Products)
+
+LIST(APPEND sources LibDict.cxx)
+ROOT_GENERATE_DICTIONARY( "${headers}"  LinkDef.h  LibDict.cxx ".;reader/include/;modules/include;products/;${LIBCONFIG_INCLUDE_DIR}" )
+add_library( LibDict SHARED ${sources} ${header} )
+target_link_libraries(LibDict ${ROOT_LIBRARIES} ${LIBCONFIG_LIBRARIES} ${LIBCONFIGPP_LIBRARY} )
 
 
 ###############      build the library     #####################

@@ -3,6 +3,16 @@
 
 #include <map>
 
+#include "TStopwatch.h"
+#include "TTree.h"
+
+
+#include "Vmodule.hh"
+
+
+using namespace std;
+
+
 class ModuleManager{
 
 public:
@@ -13,13 +23,29 @@ protected:
 
   ModuleManager();
 
-  ~ModuleManager(){};
+  ~ModuleManager();
 
 private:
   map<string, Vmodule*> moduleCollection;
+  TTree* ftree ;
+
+
+  map<string, double> timerCollection_real;
+  map<string, double> timerCollection_cpu;
+  TStopwatch* timer;
+  int Nevent_treatmentTime, fnEventTreated;
+
 
 
 public:
+
+  void registerModule(Vmodule*, string);
+
+  void processEvent(/*Event* event*/);
+
+  inline void SetTree(TTree* tree){
+    ftree = tree;
+  };
 
   inline static ModuleManager* getInstance(){
     if (theModuleManager == NULL)
@@ -28,8 +54,8 @@ public:
   };
 
   inline static void freeInstance(){
-    if (thePostgresqlConnection != NULL)
-    delete thePostgresqlConnection;
+    if (theModuleManager != NULL)
+    delete theModuleManager;
   };
 };
 
